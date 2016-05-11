@@ -1,0 +1,32 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ This work is sponsored by the Department of the Air Force under Air Force
+ Contract FA8721-05-C-0002. Opinions, interpretations, conclusions, and
+ recommendations are those of the author and are not necessarily endorsed by
+ the United States Government.
+-->
+
+<launch>
+	
+
+  
+  <arg name="racecar_version" />
+  <arg name="joy_teleop_config"
+       default="$(find racecar)/config/$(arg racecar_version)/joy_teleop.yaml" />
+
+
+  <rosparam file="$(arg joy_teleop_config)" command="load" />
+
+  <node pkg="joy" type="joy_node" name="joy_node" />
+
+  <node pkg="joy_teleop" type="joy_teleop.py" name="joy_teleop" >
+      <!-- Switch remap out when running real car -->
+      <!-- remap from="ackermann_cmd_mux/input/teleop" to="cmd_vel" / -->
+  </node>
+		
+  <!-- additional nodes for joystick controlling using remap to ackermann-->
+  <!--node name="cmd_vel_to_ackermann" pkg="vesc_ackermann" type="cmd_vel_to_ackermann.py" output="screen" >
+  	<remap from="ackermann_cmd" to="ackermann_cmd_mux/input/teleop" />
+  </node -->
+
+</launch>

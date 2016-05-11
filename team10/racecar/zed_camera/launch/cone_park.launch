@@ -1,0 +1,13 @@
+<!-- -*- mode: XML -*- -->
+<!--
+cone parker launch filee
+-->
+<launch>
+
+  <node name="command_filter" pkg="racecar_laser" type="command_filter.py"/>
+  <node name="image_parser" pkg="zed_camera" type="image_parser.py"/>
+  <node name="IBS_controller" pkg="zed_camera" type="IBS_controller.py"/>
+
+
+  
+</launch>

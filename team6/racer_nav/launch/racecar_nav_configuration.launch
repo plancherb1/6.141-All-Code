@@ -1,0 +1,24 @@
+<launch>
+	<!-- config file only when simulating -->
+  <arg name="racecar_version" default="racecar-v2"/>
+  <arg name="sensors_config"
+       default="$(find racecar)/config/$(arg racecar_version)/sensors.yaml" />
+  <arg name="vesc_config" default="$(find racecar)/config/$(arg racecar_version)/vesc.yaml" />
+  <rosparam file="$(arg vesc_config)" command="load" />
+  <rosparam file="$(arg sensors_config)" command="load" />
+  
+  <!-- laser -->
+  <node pkg="urg_node" type="urg_node" name="laser_node" output="screen" />
+  <!-- imu -->
+  <node pkg="razor_imu_9dof" type="imu_node.py" name="imu_node" output="screen"/>
+  
+  <!-- vesc driver and odom -->
+  <node pkg="vesc_ackermann" type="ackermann_to_vesc_node" name="ackermann_to_vesc">
+    <remap from="ackermann_cmd" to="ackermann_cmd_mux/output" />
+  </node>
+  <node pkg="vesc_driver" type="vesc_driver_node" name="vesc_driver" />
+  <node pkg="vesc_ackermann" type="vesc_to_odom_node" name="vesc_to_odom" output="screen"/>
+
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)/static_transforms.launch.xml" />
+
+</launch>

@@ -1,0 +1,16 @@
+<!-- -*- mode: XML -*- -->
+<!--
+sim launch
+-->
+<launch>
+ <remap from="/scan" to="/racecar/laser/scan"/>
+ <remap from="/vesc/ackermann_cmd_mux/input/teleop" to="/racecar/ackermann_cmd_mux/input/teleop"/>
+
+  <!-- default (zero) ackermann command -->
+  <node name="laser_parser" pkg="racecar_laser" type="laser_parser.py"/>
+  <node name="object_detection" pkg="racecar_laser" type="object_detection.py"/>
+  <node name="servo_commands" pkg="racecar_laser" type="command_filter.py"/>
+  <node name="wall_detection_ver2" pkg="racecar_laser" type="wall_detection_ver2.py"/>
+  
+
+</launch>

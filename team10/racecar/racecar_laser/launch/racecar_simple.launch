@@ -1,0 +1,36 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ Simple backup controller for the racecar
+-->
+
+<launch>
+  <!-- Launch the basic systems on the car (a la teleop.launch) -->
+  <arg name="racecar_version" default="racecar-v2" />
+  <arg name="run_camera" default="true"/>
+
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)-teleop.launch.xml">
+    <arg name="racecar_version" value="$(arg racecar_version)" />
+    <arg name="run_camera" value="$(arg run_camera)" />
+  </include>
+
+  <!-- Launch the camera -->
+  <include file="$(find zed_wrapper)/launch/zed_depth.launch" />
+  
+  <!-- Nodes to determine ideal direction around obstaces -->
+  <node name ="Openspace_detection" pkg ="racecar_laser" type ="openspace_detection.py"/>
+  
+  <!-- OpenCV / Visualization nodes -->
+  <node name ="image_parse" pkg ="zed_camera" type ="new_image_parser.py"/>
+
+  <!-- Main Controller Package includes the main node the Emergency Stop Node  
+       and any other support nodes -->
+  <node name ="DataToVisualGoalNode" pkg ="main_controller" type ="dataToVisualGoal.py" />
+  <node name ="ControllerNode2" pkg ="main_controller" type ="controller2.py" />
+  <node name ="EmergencyNode2" pkg ="main_controller" type ="emergency2.py" />
+
+  <!-- Finally launch the simple laser controller to determine the path -->
+  <node name ="LaserController" pkg ="racecar_laser" type ="laser_controller.py"/>
+  
+
+</launch>
+

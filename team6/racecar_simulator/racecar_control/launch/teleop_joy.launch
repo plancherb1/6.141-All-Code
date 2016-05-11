@@ -1,0 +1,33 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ This work is sponsored by the Department of the Air Force under Air Force
+ Contract FA8721-05-C-0002. Opinions, interpretations, conclusions, and
+ recommendations are those of the author and are not necessarily endorsed by
+ the United States Government.
+-->
+
+<launch>
+  <remap from="vesc/ackermann_cmd_mux/input/safety" to="racecar/ackermann_cmd_mux/input/teleop" />
+  <arg name="racecar_version" default="racecar-v2" />
+  <arg name="run_camera" default="false"/>
+
+  <!-- joystick to ackermann command for simulator-->
+  <include file="$(find racecar)/launch/includes/common/joy_teleop(simulator).launch.xml" >
+    <arg name="racecar_version" value="$(arg racecar_version)" />   
+  </include>
+  
+  <!-- priority-based command multiplexer -->
+  <include file="$(find ackermann_cmd_mux)/launch/standalone.launch">
+    <arg name="nodelet_manager_name" value="ackermann_cmd_mux_nodelet_manager" />
+    <arg name="config_file" value="$(find racecar)/config/$(arg racecar_version)/mux.yaml" />
+  </include>
+
+<!--additional nodes for Lab 3 -->
+  <node name="Obstacle_detect_node" pkg="racecar_nav" type="is_obstacle.py" output="screen" />
+    <remap from="scan" to="racecar/laser/scan" />
+  <node name="Safety_node" pkg="racecar_nav" type="safety_stop_reverse.py" output="screen" />
+  <node name="IBVS_node" pkg="racecar_nav" type="IBVS_Node"/>
+
+
+
+</launch>

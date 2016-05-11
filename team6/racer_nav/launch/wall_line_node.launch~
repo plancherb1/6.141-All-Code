@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find racecar_control)/launch/teleop.launch" />
+  <include file="$(find racecar_gazebo)/launch/racecar_tunnel.launch" />
+  <node name="wallLineNode" pkg="racer_nav" type="WallLineNode.py" />
+
+</launch>

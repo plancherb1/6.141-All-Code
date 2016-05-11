@@ -1,0 +1,15 @@
+<!-- -*- mode: XML -*- -->
+<!--
+robot launch
+-->
+<launch>
+
+
+  <!-- default (zero) ackermann command -->
+  <node name="laser_parser" pkg="racecar_laser" type="laser_parser.py"/>
+  <node name="object_detection" pkg="racecar_laser" type="object_detection.py"/>
+  <node name="servo_commands" pkg="racecar_laser" type="servo_commands.py"/>
+  <node name="wall_detection_ver2" pkg="racecar_laser" type="wall_detection_ver2.py"/>
+  
+
+</launch>

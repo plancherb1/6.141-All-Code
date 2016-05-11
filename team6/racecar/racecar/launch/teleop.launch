@@ -1,0 +1,25 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ This work is sponsored by the Department of the Air Force under Air Force
+ Contract FA8721-05-C-0002. Opinions, interpretations, conclusions, and
+ recommendations are those of the author and are not necessarily endorsed by
+ the United States Government.
+-->
+
+<launch>
+  <arg name="racecar_version" default="racecar-v2" />
+  <arg name="run_camera" default="false"/>
+
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)-teleop.launch.xml">
+    <arg name="racecar_version" value="$(arg racecar_version)" />
+    <arg name="run_camera" value="$(arg run_camera)" />
+  </include>
+
+<!--additional nodes for Lab 3 -->
+  <node name="Obstacle_detect_node" pkg="racecar_nav" type="is_obstacle.py" output="screen" />
+  <node name="Safety_node" pkg="racecar_nav" type="safety_stop_reverse.py" output="screen" />
+
+
+
+
+</launch>

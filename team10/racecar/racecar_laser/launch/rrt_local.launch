@@ -1,0 +1,43 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ This work is sponsored by the Department of the Air Force under Air Force
+ Contract FA8721-05-C-0002. Opinions, interpretations, conclusions, and
+ recommendations are those of the author and are not necessarily endorsed by
+ the United States Government.
+-->
+
+<launch>
+  <!-- Launch the laster parser and obstacle detector to analyze the laser data -->
+  <node name ="laser_parser" pkg="racecar_laser" type="laser_parser.py"/>
+  <node name ="object_detection" pkg="racecar_laser" type="object_detection.py"/>
+
+  <!-- Turn the analyzed laser data into an occupancy grid and then expand it so the
+       free space is all navigable by the car -->
+  <node name ="occupancy_grid" pkg="particle_filter" type="obstacle_to_gridv2.py"/> 
+  <node name ="obstacle_expansion" pkg ="rrt" type ="obstacle_expansion.py"/>
+  
+  <!-- Nodes to localize and get high level goal -->
+  <node name ="Openspace_detection" pkg ="racecar_laser" type ="openspace_detection.py"/>
+  
+  <!-- OpenCV / Visualization nodes -->
+  <!--
+	TBD
+  -->
+
+  <!-- Main Controller Package includes the main node the nodes that take input
+       from whatever global localization and visual spit out and turns that into 
+       a point and also the Emergency Stop Node  -->
+  <node name ="ControllerNode" pkg ="main_controller" type ="controller.py" />
+  <node name ="MapToPointGoalNode" pkg ="main_controller" type ="mapToPointGoal.py" />
+  <node name ="DataToVisualGoalNode" pkg ="main_controller" type ="dataToVisualGoal.py" />
+  <node name ="EmergencyNode" pkg ="main_controller" type ="emergency.py" />
+
+  <!-- Finally launch the main RRT to compute the local path -->
+  <node name ="rrt_path" pkg ="rrt" type ="6141_rrt.py"/>
+  
+
+ <!--  <node name ="command_filter" pkg="racecar_laser" type="command_filter.py"/>-->
+<!--   <node name ="wall_detection" pkg="racecar_laser" type="wall_detection.py"/>-->
+  <!-- <node name ="wall_follower" pkg="racecar_laser" type="wall_follower.py"/> -->
+</launch>
+

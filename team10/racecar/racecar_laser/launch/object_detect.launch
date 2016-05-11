@@ -1,0 +1,19 @@
+<!-- -*- mode: XML -*- -->
+<!--
+ This work is sponsored by the Department of the Air Force under Air Force
+ Contract FA8721-05-C-0002. Opinions, interpretations, conclusions, and
+ recommendations are those of the author and are not necessarily endorsed by
+ the United States Government.
+-->
+  <include file="$(find)/launch/includes/$(arg racecar_version)-teleop.launch.xml">
+    <arg name="racecar_version" value="$(arg racecar_version)" />
+    <arg name="run_camera" value="$(arg run_camera)" />
+  </include>
+
+<launch>
+  <node name ="laser_parser" pkg="racecar_laser" type="laser_parser.py"/>
+  <node name ="object_detection" pkg="racecar_laser" type="object_detection.py"/>
+ <!--  <node name ="command_filter" pkg="racecar_laser" type="command_filter.py"/>-->
+<!--   <node name ="wall_detection" pkg="racecar_laser" type="wall_detection.py"/>-->
+  <!-- <node name ="wall_follower" pkg="racecar_laser" type="wall_follower.py"/> -->
+</launch>

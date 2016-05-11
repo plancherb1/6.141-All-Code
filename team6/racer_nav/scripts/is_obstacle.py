@@ -1,0 +1,71 @@
+#!/usr/bin/python
+#
+import rospy
+import math
+from  std_msgs.msg import Float32 
+from sensor_msgs.msg import LaserScan
+from racecar_nav.msg import IsObstacle
+
+class IsObstacleNode:
+    def __init__(self):
+        self.safetydistance = 0.5
+        
+        # subscribe to the scan topic; comment out which one you want to use
+        """ On Baymax """
+        # rospy.Subscriber("scan", LaserScan, self.IsObstacle_callback)
+        """ On Simulator """
+        rospy.Subscriber("/racecar/laser/scan", LaserScan, self.IsObstacle_callback)
+        
+        # advertise that we'll publish on the IsObstacle topic
+        self.ObstacleIndex_pub = rospy.Publisher("IsObstacle", IsObstacle, queue_size = 10)
+        self.RightWallAngle_pub = rospy.Publisher("RightSideAngle", Float32, queue_size =10)
+        self.LeftWallAngle_pub = rospy.Publisher("LeftSideAngle", Float32, queue_size =10)
+
+    def IsObstacle_callback(self, LaserScan_msg):
+    # Test LaserScan minium range 0.3 and determine if obstacle is within cone of +/-30 degrees, 0.5m from front
+    # Laser index 0:1080, using 420:660 for +/- 30 degrees
+        Obstacledata = IsObstacle()
+        Obstacledata.obstacle = False
+        cone = list(LaserScan_msg.ranges[420:660])
+        if min(cone) < self.safetydistance:
+            Obstacledata.index = [(cone.index(i) + 420) for i in cone if i <= self.safetydistance]
+            #There might be dirt on the laser, so if no. of points is more than threshold of 5, Obstacle = TRUE
+            if len(Obstacledata.index) > 5:
+               Obstacledata.obstacle = True
+            self.ObstacleIndex_pub.publish(Obstacledata)
+    
+    # Test make 1 m radius bubble
+    # Laser index 0:1080, using 0:420 for left bubble and 660: for right detection bubble
+        LeftSideAngle = 0
+	PastLeftSideAngle = 90
+	DEGREETOINDEX = 1080/float(135*2)
+	INDEXTODEGREE = (135*2)/float(1080)
+	FOWARDINDEX = 540
+        RIGHTANGLEINDEX = 360
+	LEFTSIDEINDEX = int(FOWARDINDEX+(RIGHTANGLEINDEX))
+	
+        ninety_deg_wall_distanceL = list(LaserScan_msg.ranges[LEFTSIDEINDEX-5:LEFTSIDEINDEX+5])
+        compareDistance = sum(ninety_deg_wall_distanceL)/float(len(ninety_deg_wall_distanceL))
+	Cone = list(LaserScan_msg.ranges[0:])
+        leftCone = list(LaserScan_msg.ranges[720:])
+        pastGamma = None
+         # [(leftCone[i]) for i in cone if i <= self.safetydistance]
+        if (compareDistance < 5) : # 1m bubble to check around
+            minIndex =LEFTSIDEINDEX+90
+            # translate from index diff to angle diff
+            B = float(Cone[minIndex])
+            A = compareDistance
+            CurrentLeftSideAngle = (minIndex-LEFTSIDEINDEX)*INDEXTODEGREE
+            C = math.sqrt(A**2+B**2-2*A*B*math.cos(math.radians(CurrentLeftSideAngle)))
+            gamma = 90-math.degrees(math.acos(-1*((B**2-A**2-C**2)/(2*A*C))))## calculate angle|convert to radians
+	    if (pastGamma== None):
+	    	pastGamma = gamma
+            if (abs(pastGamma-gamma)>5):
+            	gamma = pastGamma
+	    pastGamma=gamma
+	    self.LeftWallAngle_pub.publish(gamma)     
+
+if __name__ == '__main__':
+    rospy.init_node("IsObstacle_Node")
+    node = IsObstacleNode()
+    rospy.spin()
